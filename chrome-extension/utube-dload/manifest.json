@@ -1,1 +1,23 @@
-
+{
+	"manifest_version": 2,
+	"name": "utube-dload",
+	"version": "1.2",
+	"icons": {
+		"48": "static/icon48.png"
+	},
+	"permissions": [
+		"https://*.ikbal-nayem.repl.co/*",
+		"https://*.herokuapp.com/*"
+	],
+	"background": {
+    "persistent": false,
+    "scripts": ["static/jquery.min.js", "background.js"]
+  },
+	"content_scripts":[
+		{
+			"matches": ["https://*.youtube.com/watch?*"],
+			"js": ["static/jquery.min.js", "content.js"],
+			"css": ["static/font-awesome.min.css"]
+		}
+	]
+}
