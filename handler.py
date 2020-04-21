@@ -1,9 +1,9 @@
 import requests
 from bs4 import BeautifulSoup as bs
 
-url = 'https://youtube.com'
+url = 'https://online.freemusicdownloads.worldm'
 headers = {
-	'origin': 'https://youtube.com',
+	'origin': 'https://online.freemusicdownloads.world',
 	'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36',
 }
 
