@@ -1,7 +1,3 @@
-$(document).ready(function(){
-	setTimeout(createButton, 3000)
-})
-
 drp = `<style>
 				.dropbtn {
 				  background-color: initial;
@@ -60,7 +56,6 @@ function createButton(){
 	var url = location.href
 	var video_id = url.split('=')[1]
 	
-
 	var port = chrome.runtime.connect({name: video_id})
 	port.onMessage.addListener(function(msg){
 		if (msg.success){
@@ -69,7 +64,18 @@ function createButton(){
 			$('.dropbtn').css({color: '#00cc00'});
 		} else {
 			$('.dropbtn').css('color', 'red')
+			$('.dropdown-content').remove()
 		}
 	})
 }
 
+
+setTimeout(createButton, 2000)
+
+chrome.runtime.onMessage.addListener(function(msg, sender){
+	if(msg.task == 'reload'){
+		$('.dropdown').remove()
+		createButton()
+		console.log('reloading links...')
+	}
+})
