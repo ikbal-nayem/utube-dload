@@ -12,20 +12,24 @@ def getLink(vid):
 	print(vid)
 	links = {}
 	title = _getTitle(vid)
-	for vtype in ['MP3', 'MP4']:
-		print(f'Generating {vtype} link...')
-		data={
-			'title': title,
-			'is_playlist':'False',
-			'video_id': vid,
-			'type': vtype,
-		}
-		req = requests.post(url+'/start-download', headers=headers, data=data)
-		html = bs(req.text, 'html.parser')
-		link = html.findAll(attrs={'class':'dl-boxes'})[0].contents[1]['href']
-		links[vtype] = url+link
-	print('Done')
-	return links
+	if title:
+		print(title)
+		for vtype in ['MP3', 'MP4']:
+			print(f'Generating {vtype} link...')
+			data={
+				'title': title,
+				'is_playlist':'False',
+				'video_id': vid,
+				'type': vtype,
+			}
+			req = requests.post(url+'/start-download', headers=headers, data=data)
+			html = bs(req.text, 'html.parser')
+			link = html.findAll(attrs={'class':'dl-boxes'})[0].contents[1]['href']
+			links[vtype] = url+link
+		print('Done')
+		links['success'] = True
+		return links
+	return {'success': False}
 
 
 def _getTitle(vid):
@@ -37,5 +41,5 @@ def _getTitle(vid):
 		firstVideo = soup.findAll(attrs={'class':'yt-uix-tile-link'})[0]
 		return firstVideo['title']
 	except Exception as e:
-		raise Exception('Error occured while searching on youtube (_getTitleID):\n'+str(e))
+		raise Exception('Error occured while searching on youtube:\n'+str(e))
 		return None
