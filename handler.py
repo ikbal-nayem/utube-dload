@@ -2,9 +2,9 @@ import requests
 from bs4 import BeautifulSoup as bs
 import info
 
-url = info.url
+url = info.url2
 headers = {
-	'origin': info.url,
+	'origin': info.url2,
 	'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36',
 }
 

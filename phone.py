@@ -4,9 +4,9 @@ import info
 
 class Youtube:
 	KEY = info.KEY
-	url = info.url
+	backup_url = info.url2
 	headers = {
-		'origin': info.url,
+		'origin': info.url2,
 		'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36',
 	}
 
@@ -19,6 +19,7 @@ class Youtube:
 		self.video_time = None
 		self.published = None
 		self.views = None
+		self.links = {}
 		self.success = False
 		self.message = None
 			
@@ -60,13 +61,18 @@ class Youtube:
 			print('Error occured while getting info from youtube :\n'+str(e))
 		
 
-	def getLink(self):
-		if 'youtube.com' in self.query or 'youtu.be' in self.query:
-			self._getVideoInfo(self._getVID(self.query))
-		else:
-			self._getVideoInfo(self.query)
-		print('Getting link...')
-		links = {}
+	def _getMainLinks(self):					# main links
+		yt_link = 'https://www.youtube.com/watch?v={}'.format(self.vid)
+		post_data = {"url": yt_link}
+		try:
+			res = requests.post(info.url1, data=post_data).json()
+			for urls in res['url']:
+				if urls['attr']['class']!='no-audio':
+					self.links[urls['attr']['title']] =  urls['url']
+		except:
+			print('Main links are not found')
+
+	def _getBackupLinks(self):				# backup links
 		for vType in ['MP3', 'MP4']:
 			data={
 				'title': self.title,
@@ -75,16 +81,26 @@ class Youtube:
 				'type': vType,
 			}
 			try:
-				req = requests.post(Youtube.url+'/start-download', headers=Youtube.headers, data=data)
+				req = requests.post(Youtube.backup_url+'/start-download', headers=Youtube.headers, data=data)
 				html = bs(req.text, 'html.parser')
 				link = html.findAll(attrs={'class':'dl-boxes'})[0].contents[1]['href']
-				links[vType.lower()] = Youtube.url+link
+				self.links['{} (backup)'.format(vType)] = Youtube.backup_url+link
 				self.success = True
 			except Exception as e:
 				self.success = False
 				self.message = 'download link not found'
 				print('Error occured while getting download link:\n'+str(e))
-		
+
+
+	def getLink(self):
+		if 'youtube.com' in self.query or 'youtu.be' in self.query:
+			self._getVideoInfo(self._getVID(self.query))
+		else:
+			self._getVideoInfo(self.query)
+		print('Getting link...')
+		self._getMainLinks()
+		self._getBackupLinks()
+	
 		if self.success:
 			print('Sending data...')
 			return {
@@ -95,7 +111,7 @@ class Youtube:
 				"video_time": self.video_time,
 				"published": self.published,
 				"views": self.views,
-				"links": links
+				"links": self.links
 			}
 		else:
 			print('Error')
