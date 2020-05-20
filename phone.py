@@ -42,6 +42,8 @@ class Youtube:
 			soup = bs(response.text, 'html.parser')
 			content = soup.findAll('div', attrs={'class':'yt-lockup'})[0]
 			self.thumb = content.img['src']
+			if 'https' not in self.thumb:
+				self.thumb = 'https:'+self.thumb
 			self.video_time = str(content.find('span', attrs={'class': 'video-time'}).text).strip()
 			self.title = content.find('a', attrs={'class': 'yt-uix-tile-link'})['title']
 			meta_info = content.find('ul', attrs={'class': 'yt-lockup-meta-info'}).findAll('li')
