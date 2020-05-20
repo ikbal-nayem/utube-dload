@@ -1,11 +1,12 @@
 import requests
 from bs4 import BeautifulSoup as bs
+import info
 
 class Youtube:
-	KEY = 'a20be49340d5fb483d02be34482f6b5d'
-	url = 'https://online.freemusicdownloads.world'
+	KEY = info.KEY
+	url = info.url
 	headers = {
-		'origin': 'https://online.freemusicdownloads.world',
+		'origin': info.url,
 		'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36',
 	}
 
@@ -43,15 +44,19 @@ class Youtube:
 			self.thumb = content.img['src']
 			self.video_time = str(content.find('span', attrs={'class': 'video-time'}).text).strip()
 			self.title = content.find('a', attrs={'class': 'yt-uix-tile-link'})['title']
-			self.published, self.views = (ele.text.strip() for ele in content.find('ul', attrs={'class': 'yt-lockup-meta-info'}).findAll('li'))
+			meta_info = content.find('ul', attrs={'class': 'yt-lockup-meta-info'}).findAll('li')
+			if len(meta_info)>1:
+				self.published, self.views = (ele.text.strip() for ele in meta_info)
+			else:
+				self.published, self.views = 'Unknown', meta_info[0].text.strip()
 			href = content.find('a', attrs={'class': 'yt-uix-tile-link'})['href']
 			self.vid = self._getVID('https://www.youtube.com' + href)
 			self.success = True
-			self.message = 'video not found'
 		except Exception as e:
 			self.success = False
-			raise Exception('Error occured while getting info from youtube :\n'+str(e))
-	
+			self.message = 'video not found'
+			print('Error occured while getting info from youtube :\n'+str(e))
+		
 
 	def getLink(self):
 		if 'youtube.com' in self.query or 'youtu.be' in self.query:
@@ -76,9 +81,10 @@ class Youtube:
 			except Exception as e:
 				self.success = False
 				self.message = 'download link not found'
-				raise Exception('Error occured while getting download link:\n'+str(e))
+				print('Error occured while getting download link:\n'+str(e))
 		
 		if self.success:
+			print('Sending data...')
 			return {
 				"success": self.success,
 				"vid": self.vid,
@@ -90,6 +96,7 @@ class Youtube:
 				"links": links
 			}
 		else:
+			print('Error')
 			return {
 				"success": self.success,
 				"message": self.message

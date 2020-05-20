@@ -19,9 +19,8 @@ def phoneDownload():
 		if Youtube.KEY == request.form['key']:
 			query = request.form['query']
 			yt = Youtube(query)
-			print('Done')
 			return jsonify(yt.getLink())
-		return jsonify({'message': 'Invalid request'})
+		return jsonify({'success': False, 'message': 'Invalid request'})
 	return '<h1>Hello how do you feel today?</h1>'
 
 
